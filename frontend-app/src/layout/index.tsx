@@ -112,7 +112,10 @@ const Layout: React.FC = () => {
         </Container>
       </AppBar>
 
-      <Outlet />
+      <Box component="main">
+        <Outlet />
+
+      </Box>
     </Box>
   );
 };
