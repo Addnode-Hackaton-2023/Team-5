@@ -18,13 +18,18 @@ public class ETAService
     @Autowired
     ETARepository etaRepository;
 
-    public String addEta()
+    /**
+     * add new ETA
+     */
+    public String addEta(ETA eta)
     {
-        etaRepository.save(
-            new ETA(555555L, LocalDateTime.now(), -77.0364,38.8951, 5.0)
-        );
-        return"new eta saved";
+        etaRepository.save(eta);
+        return"new eta: " + eta.getId();
     }
+
+    /**
+     * get ETA by id
+     */
     public Optional<ETA> getEtaById(Long id)
     {
         return etaRepository.findById(id);

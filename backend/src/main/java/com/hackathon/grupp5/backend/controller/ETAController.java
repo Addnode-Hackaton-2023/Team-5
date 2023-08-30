@@ -1,5 +1,6 @@
 package com.hackathon.grupp5.backend.controller;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.hackathon.grupp5.backend.model.ETA;
 import com.hackathon.grupp5.backend.service.ETAService;
 
 @RestController
@@ -22,8 +24,8 @@ public class ETAController
     ETAService etaService;
 
     @PostMapping(path = "/add")
-    public @ResponseBody List addEta(){
-        return Collections.singletonList(etaService.addEta());
+    public @ResponseBody List addEta(@RequestBody ETA eta){
+        return Collections.singletonList(etaService.addEta(eta));
     }
 
     @GetMapping(path = "/get/{id}") public @ResponseBody String getEta(@PathVariable Long id){
