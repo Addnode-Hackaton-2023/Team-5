@@ -1,7 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 import PublicPage from "../pages/PublicPage";
 import EtaPage from "../pages/EtaPage";
-import Layout from "../layout/indext";
+import Layout from "../layout";
 
 export const router = createBrowserRouter([
   {
