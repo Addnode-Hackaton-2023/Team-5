@@ -1,11 +1,11 @@
 package com.hackathon.grupp5.backend.controller;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,20 +22,13 @@ public class ETAController
     ETAService etaService;
 
     @PostMapping(path = "/add")
-    public @ResponseBody List addEta(@RequestBody HashMap data){
-
-        // ...
-
-        return null;
+    public @ResponseBody List addEta(){
+        return Collections.singletonList(etaService.addEta());
     }
 
-    @GetMapping(path = "/get") public @ResponseBody String getEta(){
-        List<String> list = new ArrayList();
-
-        // ...
-
-        //return etaService.getEtaById(1L);
-        return "YööY";
+    @GetMapping(path = "/get/{id}") public @ResponseBody String getEta(@PathVariable Long id){
+        System.out.println("id = " + id);
+        return etaService.getEtaById(id).get().toString();
     }
 
 }
