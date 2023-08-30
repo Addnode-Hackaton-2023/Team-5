@@ -1,0 +1,2 @@
+Swagger från grupp rutt-gruppen
+https://allwinapi20230830114644.azurewebsites.net/swagger/index.html
