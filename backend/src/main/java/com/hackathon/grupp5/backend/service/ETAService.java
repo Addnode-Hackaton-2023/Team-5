@@ -132,16 +132,20 @@ public class ETAService
             //Go over the list in database and set the ETAs that wasn't recieved to inactive.
             var activeEtas = getAllByStatus(Status.ACTIVE);
             activeEtas.forEach(eta -> {
-                String isActiveURL = "https://allwinapi20230830114644.azurewebsites.net/api/Job/IsActiveJob?jobId=" + eta.getId();
-                ResponseEntity<Boolean> isActive = restTemplate.exchange(
-                        isActiveURL, HttpMethod.GET, null, Boolean.class);
-                if(isActive.getStatusCode().is2xxSuccessful()) {
-                    Boolean responseValue = isActive.getBody();
-                    if(responseValue != null && !responseValue) {
-                        eta.setStatus(Status.FINISHED);
-                        update(eta);
+                try {
+                    String isActiveURL = "https://allwinapi20230830114644.azurewebsites.net/api/Job/IsActiveJob?jobId=" + eta.getId();
+                    ResponseEntity<Boolean> isActive = restTemplate.exchange(
+                            isActiveURL, HttpMethod.GET, null, Boolean.class);
+                    if(isActive.getStatusCode().is2xxSuccessful()) {
+                        Boolean responseValue = isActive.getBody();
+                        if(responseValue != null && !responseValue) {
+                            eta.setStatus(Status.FINISHED);
+                            update(eta);
+                        }
+                    } else if (isActive.getStatusCode().isError()) {
+                        System.out.println("Jobb id: " + eta.getId() + " hittades inte eller så är deras server nere");
                     }
-                } else if (isActive.getStatusCode().isError()) {
+                } catch (Exception e) {
                     System.out.println("Jobb id: " + eta.getId() + " hittades inte eller så är deras server nere");
                 }
             });
