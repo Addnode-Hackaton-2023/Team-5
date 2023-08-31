@@ -1,7 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { GISRoute } from "../components/map/models/GISRoute";
 
-axios.defaults.baseURL = "http://localhost:7000/";
+axios.defaults.baseURL = "http://localhost:8080/";
 
 axios.interceptors.response.use(
   async (response) => {
