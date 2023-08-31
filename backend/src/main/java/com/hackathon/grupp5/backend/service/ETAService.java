@@ -84,6 +84,6 @@ public class ETAService
     }
 
     public Optional<CitatDTO> getLatestDelivery() {
-        return etaRepository.findTopByOrderByEtaDesc().stream().findFirst().map(dto -> new CitatDTO(dto.getRecipient(), dto.getWeight().intValue() * 4));
+        return etaRepository.findTopByStatusOrderByEtaDesc(Status.FINISHED).stream().findFirst().map(dto -> new CitatDTO(dto.getRecipient(), dto.getWeight().intValue() * 4));
     }
 }
