@@ -65,3 +65,5 @@ Den totala tiden av presentation får ni distribuera som ni vill men den måste 
     - http://localhost:8080/eta/get/{id}
  * Hämtar senaste leveransen
     - http://localhost:8080/recipient/latest
+ * Tvinga fram en update av pågående körningar
+     - http://localhost:8080/eta/triggerupdate
