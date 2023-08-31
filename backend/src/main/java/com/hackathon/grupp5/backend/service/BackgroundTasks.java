@@ -22,61 +22,8 @@ public class BackgroundTasks {
     @Autowired
     ETAService etaService;
     @Scheduled(fixedDelay = 60000)
-    public void updateRoutes() {
-        final String uri = "https://allwinapi20230830114644.azurewebsites.net/api/Job/GetActiveJobs";
-        RestTemplate restTemplate = new RestTemplate();
-        ExternalRouteInstance[] result = restTemplate.getForObject(uri, ExternalRouteInstance[].class);
-
-        if (result != null) {
-            //Map external object to local object
-            List<ETA> listOfRecievedETA = Arrays.stream(result).map(routeInstance -> {
-
-                var recpient = "";
-                var recpientPhoneNumber = "";
-                if (routeInstance.getStops().length > 0) {
-                    recpient = routeInstance.getStops()[routeInstance.getStops().length - 1].getName();
-                    recpientPhoneNumber = routeInstance.getStops()[routeInstance.getStops().length - 1].getContactPerson();
-                }
-
-                ETA eta = new ETA(
-                        routeInstance.getRouteId(),
-                        LocalDateTime.parse(routeInstance.getEta()),
-                        routeInstance.getLatestLongitude(),
-                        routeInstance.getLatestLatitude(),
-                        routeInstance.getLoadedWeight(),
-                        routeInstance.getTownName(),
-                        recpient,
-                        recpientPhoneNumber,
-                        Status.ACTIVE
-                );
-
-                return eta;
-            }).toList();
-
-
-            //Go over the list in database and set the ETAs that wasn't recieved to inactive.
-            var activeEtas = etaService.getAllByStatus(Status.ACTIVE);
-            var filteredInactiveEtaList = activeEtas.stream()
-                    .filter(eta -> listOfRecievedETA.stream().anyMatch(recievedETA -> !Objects.equals(recievedETA.getId(), eta.getId()))).toList();
-
-            filteredInactiveEtaList.forEach(eta -> {
-                eta.setStatus(Status.FINISHED);
-                etaService.update(eta);
-            });
-
-            //Go over the list and make new ETA if it not exists and send SMS to the client. If exists just update.
-            listOfRecievedETA.forEach(eta -> {
-                Optional<ETA> savedETA = etaService.getEtaById(eta.getId());
-                if (savedETA.isPresent()) {
-                    etaService.add(eta);
-                } else {
-                    etaService.update(eta);
-                }
-            });
-
-
-        }
-
+    public void backgroundRunner() {
+        etaService.updateTasks();
     }
 
 }

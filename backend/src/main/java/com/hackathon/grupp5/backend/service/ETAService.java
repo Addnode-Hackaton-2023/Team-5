@@ -1,10 +1,14 @@
 package com.hackathon.grupp5.backend.service;
 
+import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.hackathon.grupp5.backend.consts.Status;
+import com.hackathon.grupp5.backend.model.externaldto.ExternalRouteInstance;
 import com.hackathon.grupp5.backend.model.frontenddto.CitatDTO;
 import com.hackathon.grupp5.backend.model.frontenddto.FrontendETA;
 import com.hackathon.grupp5.backend.model.frontenddto.FrontendGraphDTO;
@@ -16,6 +20,7 @@ import com.hackathon.grupp5.backend.model.ETA;
 import com.hackathon.grupp5.backend.repository.ETARepository;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.client.RestTemplate;
 
 @RequiredArgsConstructor
 @Service
@@ -85,5 +90,59 @@ public class ETAService
 
     public Optional<CitatDTO> getLatestDelivery() {
         return etaRepository.findTopByStatusOrderByEtaDesc(Status.FINISHED).stream().findFirst().map(dto -> new CitatDTO(dto.getRecipient(), dto.getWeight().intValue() * 4));
+    }
+
+    public void updateTasks() {
+        final String uri = "https://allwinapi20230830114644.azurewebsites.net/api/Job/GetActiveJobs";
+        RestTemplate restTemplate = new RestTemplate();
+        ExternalRouteInstance[] result = restTemplate.getForObject(uri, ExternalRouteInstance[].class);
+
+        if (result != null) {
+            //Map external object to local object
+            List<ETA> listOfRecievedETA = Arrays.stream(result).map(routeInstance -> {
+
+                var recpient = "";
+                var recpientPhoneNumber = "";
+                if (routeInstance.getStops().length > 0) {
+                    recpient = routeInstance.getStops()[routeInstance.getStops().length - 1].getName();
+                    recpientPhoneNumber = routeInstance.getStops()[routeInstance.getStops().length - 1].getContactPerson();
+                }
+
+                ETA eta = new ETA(
+                        routeInstance.getRouteId(),
+                        LocalDateTime.parse(routeInstance.getEta()),
+                        routeInstance.getLatestLongitude(),
+                        routeInstance.getLatestLatitude(),
+                        routeInstance.getLoadedWeight(),
+                        routeInstance.getTownName(),
+                        recpient,
+                        recpientPhoneNumber,
+                        Status.ACTIVE
+                );
+
+                return eta;
+            }).toList();
+
+
+            //Go over the list in database and set the ETAs that wasn't recieved to inactive.
+            var activeEtas = getAllByStatus(Status.ACTIVE);
+            var filteredInactiveEtaList = activeEtas.stream()
+                    .filter(eta -> listOfRecievedETA.stream().anyMatch(recievedETA -> !Objects.equals(recievedETA.getId(), eta.getId()))).toList();
+
+            filteredInactiveEtaList.forEach(eta -> {
+                eta.setStatus(Status.FINISHED);
+                update(eta);
+            });
+
+            //Go over the list and make new ETA if it not exists and send SMS to the client. If exists just update.
+            listOfRecievedETA.forEach(eta -> {
+                Optional<ETA> savedETA = getEtaById(eta.getId());
+                if (savedETA.isPresent()) {
+                    add(eta);
+                } else {
+                    update(eta);
+                }
+            });
+        }
     }
 }
