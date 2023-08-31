@@ -26,24 +26,10 @@ public class BackgroundTasks {
         final String uri = "https://allwinapi20230830114644.azurewebsites.net/api/Job/GetActiveJobs";
         RestTemplate restTemplate = new RestTemplate();
         ExternalRouteInstance[] result = restTemplate.getForObject(uri, ExternalRouteInstance[].class);
-        ETA mockETA = new ETA(
-                1L,
-                LocalDateTime.now(),
-                2132131.0,
-                -435436543.0,
-                36.0,
-                "Göteborg",
-                "Någon kyrka",
-                "0704559931",
-                Status.ACTIVE);
-        etaService.add(mockETA);
 
         if (result != null) {
             //Map external object to local object
             List<ETA> listOfRecievedETA = Arrays.stream(result).map(routeInstance -> {
-                String jsonString = "2023-08-30T17:37:30.6030532+00:00";
-                DateTimeFormatter formatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-                OffsetDateTime offsetDateTime = OffsetDateTime.parse(jsonString, formatter);
 
                 var recpient = "";
                 var recpientPhoneNumber = "";
@@ -54,7 +40,7 @@ public class BackgroundTasks {
 
                 ETA eta = new ETA(
                         routeInstance.getRouteId(),
-                        offsetDateTime.toLocalDateTime(),
+                        LocalDateTime.parse(routeInstance.getEta()),
                         routeInstance.getLatestLongitude(),
                         routeInstance.getLatestLatitude(),
                         routeInstance.getLoadedWeight(),

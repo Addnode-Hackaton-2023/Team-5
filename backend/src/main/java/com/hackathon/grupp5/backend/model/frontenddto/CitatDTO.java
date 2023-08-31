@@ -14,7 +14,7 @@ import java.sql.Date;
 @NoArgsConstructor
 @JsonRootName("DeliveryChartDTO")
 public class CitatDTO {
-    @JsonProperty("town")
+    @JsonProperty("recpient")
     private String recpient;
     @JsonProperty("totalMeals")
     private Integer totalMeals;
