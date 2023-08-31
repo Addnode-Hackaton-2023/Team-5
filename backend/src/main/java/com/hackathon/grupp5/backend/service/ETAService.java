@@ -1,62 +1,55 @@
 package com.hackathon.grupp5.backend.service;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-
 import com.hackathon.grupp5.backend.consts.Status;
+import com.hackathon.grupp5.backend.model.ETA;
 import com.hackathon.grupp5.backend.model.externaldto.ExternalRouteInstance;
 import com.hackathon.grupp5.backend.model.frontenddto.CitatDTO;
 import com.hackathon.grupp5.backend.model.frontenddto.FrontendETA;
 import com.hackathon.grupp5.backend.model.frontenddto.FrontendGraphDTO;
 import com.hackathon.grupp5.backend.model.frontenddto.TotalDelivered;
+import com.hackathon.grupp5.backend.repository.ETARepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
-import com.hackathon.grupp5.backend.model.ETA;
-import com.hackathon.grupp5.backend.repository.ETARepository;
-
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.client.RestTemplate;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 @RequiredArgsConstructor
 @Service
-public class ETAService
-{
+public class ETAService {
     @Autowired
     ETARepository etaRepository;
 
-    private int mealFactor = 4;
-    private int co2Factor = 2;
-    private int moneyFactor = 50;
+    private final int mealFactor = 4;
+    private final int co2Factor = 2;
+    private final int moneyFactor = 50;
 
     /**
      * add new ETA
      */
-    public String add(ETA eta)
-    {
+    public String add(ETA eta) {
         etaRepository.save(eta);
-        return"new eta: " + eta.getId();
+        return "new eta: " + eta.getId();
     }
 
     /**
      * update ETA
      */
-    public String update(ETA eta)
-    {
+    public String update(ETA eta) {
         return add(eta);
     }
 
     /**
      * get ETA by id
      */
-    public Optional<ETA> getEtaById(Long id)
-    {
+    public Optional<ETA> getEtaById(Long id) {
         return etaRepository.findById(id);
     }
 
@@ -100,7 +93,6 @@ public class ETAService
         ExternalRouteInstance[] result = restTemplate.getForObject(uri, ExternalRouteInstance[].class);
 
         if (result != null) {
-            //Map external object to local object
             List<ETA> listOfRecievedETA = Arrays.stream(result).map(routeInstance -> {
 
                 var recpient = "";
@@ -108,12 +100,12 @@ public class ETAService
                 if (routeInstance.getStops().length > 0) {
                     recpient = routeInstance.getStops()[routeInstance.getStops().length - 1].getStopName();
                     recpientPhoneNumber = routeInstance.getStops()[routeInstance.getStops().length - 1].getContactPerson();
-                    if(routeInstance.getJobId() == 1) {
+                    if (routeInstance.getJobId() == 1) {
                         System.out.println("Här fick vi null");
                     }
                 }
 
-                ETA eta = new ETA(
+                return new ETA(
                         routeInstance.getJobId(),
                         LocalDateTime.parse(routeInstance.getEta()),
                         routeInstance.getLatestLongitude(),
@@ -124,8 +116,6 @@ public class ETAService
                         recpientPhoneNumber,
                         Status.ACTIVE
                 );
-
-                return eta;
             }).toList();
 
 
@@ -136,9 +126,9 @@ public class ETAService
                     String isActiveURL = "https://allwinapi20230830114644.azurewebsites.net/api/Job/IsActiveJob?jobId=" + eta.getId();
                     ResponseEntity<Boolean> isActive = restTemplate.exchange(
                             isActiveURL, HttpMethod.GET, null, Boolean.class);
-                    if(isActive.getStatusCode().is2xxSuccessful()) {
+                    if (isActive.getStatusCode().is2xxSuccessful()) {
                         Boolean responseValue = isActive.getBody();
-                        if(responseValue != null && !responseValue) {
+                        if (responseValue != null && !responseValue) {
                             eta.setStatus(Status.FINISHED);
                             update(eta);
                         }
@@ -146,7 +136,7 @@ public class ETAService
                         System.out.println("Jobb id: " + eta.getId() + " hittades inte eller så är deras server nere");
                     }
                 } catch (Exception e) {
-                    System.out.println("Jobb id: " + eta.getId() + " hittades inte eller så är deras server nere");
+                    System.out.println("Jobb id: " + eta.getId() + " deras server verkar vara nere");
                 }
             });
             //Go over the list and make new ETA if it not exists and send SMS to the client. If exists just update.
