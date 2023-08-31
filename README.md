@@ -55,5 +55,11 @@ Den totala tiden av presentation får ni distribuera som ni vill men den måste 
   - Demo
   - Hur löser ni denna utmaning?
   - Vad är nästa steg, rekommendationer för framtiden?
- 
-  - jdbc:sqlserver://;serverName=add-hack.database.windows.net;databaseName=add-hack-5;encrypt=true
+
+ # Våra REST-API endpoints
+ * Hämtar antal måltider grupperad på stad och dag
+    - http://localhost:8080/deliverychart
+ * Hämtar totala leveranser
+    - http://localhost:8080/totaldelivered
+ * Hämtar ETA
+    - http://localhost:8080/eta/get/{id}

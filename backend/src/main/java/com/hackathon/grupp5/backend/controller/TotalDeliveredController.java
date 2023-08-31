@@ -8,11 +8,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(path = "/TotalDelivered")
+@RequestMapping(path = "/totaldelivered")
 public class TotalDeliveredController {
     @Autowired
     ETAService etaService;
-    @GetMapping(path = "/get") public @ResponseBody Optional<TotalDelivered> getDelivered(){
+    @GetMapping public @ResponseBody Optional<TotalDelivered> getDelivered(){
         return etaService.getTotalDelivered();
     }
 }
