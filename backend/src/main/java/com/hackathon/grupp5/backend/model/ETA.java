@@ -1,9 +1,7 @@
 package com.hackathon.grupp5.backend.model;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.hackathon.grupp5.backend.consts.Status;
 
 import jakarta.persistence.Entity;
@@ -24,5 +22,9 @@ public class ETA
     private Double longitude;
     private Double latitude;
     private Double weight;
+    private String town;
+    private String recipient;
+    private String phoneNumber;
     private Status status;
+
 }
