@@ -8,9 +8,9 @@ import { useEffect, useState } from "react";
 interface ChartSectionProps {}
 
 interface DeliveryChartData {
-  city: string;
-  day: Date;
-  mealCount: number;
+  town: string;
+  date: Date;
+  totalMeals: number;
 }
 
 const ChartSection: React.FC<ChartSectionProps> = () => {
@@ -22,7 +22,7 @@ const ChartSection: React.FC<ChartSectionProps> = () => {
 
   const fetchChartData = () => {
     axios
-      .get("http://localhost:8080/<Name og endpoint>")
+      .get("http://localhost:8080/deliverychart")
       .then((response) => {
         setDeliveryChartData(response.data);
       })
@@ -37,11 +37,11 @@ const ChartSection: React.FC<ChartSectionProps> = () => {
   // Transformed data for chart
   const transformedSeries = deliveryChartData?.reduce(
     (acc, data) => {
-      const existing = acc.find((item) => item.name === data.city);
+      const existing = acc.find((item) => item.name === data.town);
       if (existing) {
-        existing.data.push(data.mealCount);
+        existing.data.push(data.totalMeals);
       } else {
-        acc.push({ name: data.city, data: [data.mealCount] });
+        acc.push({ name: data.town, data: [data.totalMeals] });
       }
       return acc;
     },
@@ -50,8 +50,9 @@ const ChartSection: React.FC<ChartSectionProps> = () => {
 
   // Days for categories (Assuming sorted)
   const categories =
-    deliveryChartData?.map((data) => new Date(data.day).toLocaleDateString()) ||
-    [];
+    deliveryChartData?.map((data) =>
+      new Date(data.date).toLocaleDateString()
+    ) || [];
 
   // Final Chart Data
   const chartData: ApexOptions = {

@@ -2,10 +2,7 @@ import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
 import Container from "@mui/material/Container";
 import { Link, Outlet } from "react-router-dom";
 import Copyright from "../components/footer";
@@ -16,42 +13,31 @@ const Layout: React.FC = () => {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" sx={{ height: 120 }}>
         <Container maxWidth="xl" sx={{ my: "auto" }}>
-          <Toolbar disableGutters>
+          <Toolbar
+            disableGutters
+            sx={{ justifyContent: "center", alignItems: "center" }}
+          >
             <Box
-              sx={{ display: { xs: "none", md: "flex" } }}
               component={Link}
               to={"/"}
-            >
-              <img
-                style={{
-                  marginRight: 2,
-                  fontFamily: "monospace",
-                  fontWeight: 700,
-                  letterSpacing: ".3rem",
-                  color: "inherit",
-                  textDecoration: "none",
-                }}
-                alt="Allwin Logo"
-                src="https://static.wixstatic.com/media/49e5b6_32c39682e4804e24bce18237839c4d1c~mv2.png/v1/fill/w_63,h_63,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/Allwin_Logo_Round_03.png"
-              />
-            </Box>
+              sx={{
+                display: "flex",
+                justifyContent: "center",
 
-            <Box
-              sx={{ display: { xs: "flex", md: "none" } }}
-              component={Link}
-              to={"/"}
+                alignItems: "center",
+              }}
             >
               <img
+                alt="Allwin Logo"
+                src="https://static.wixstatic.com/media/49e5b6_32c39682e4804e24bce18237839c4d1c~mv2.png/v1/fill/w_63,h_63,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/Allwin_Logo_Round_03.png"
                 style={{
-                  marginRight: 2,
+                  marginInline: "auto",
                   fontFamily: "monospace",
                   fontWeight: 700,
                   letterSpacing: ".3rem",
                   color: "inherit",
                   textDecoration: "none",
                 }}
-                alt="Allwin Logo"
-                src="https://static.wixstatic.com/media/49e5b6_32c39682e4804e24bce18237839c4d1c~mv2.png/v1/fill/w_63,h_63,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/Allwin_Logo_Round_03.png"
               />
             </Box>
           </Toolbar>

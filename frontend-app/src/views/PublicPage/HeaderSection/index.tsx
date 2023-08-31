@@ -7,26 +7,53 @@ import { useState, useEffect } from "react";
 interface HeaderSectionProps {}
 
 interface TotalSavedData {
-  mealCount: string;
-  savedCO2: string;
-  savedMoney: string;
+  meals: string;
+  co2: string;
+  money: string;
 }
 
 const HeaderSection: React.FC<HeaderSectionProps> = () => {
   const theme = useTheme();
 
   const [cardData, setCardData] = useState<TotalSavedData>();
+  const [animatedMeals, setAnimatedMeals] = useState(0);
+  const [animatedCO2, setAnimatedCO2] = useState(0);
+  const [animatedMoney, setAnimatedMoney] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/cards")
+      .get("http://localhost:8080/totaldelivered")
       .then((response) => {
         setCardData(response.data);
       })
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    if (cardData) {
+      const intervalMeals = setInterval(() => {
+        setAnimatedMeals((prev) =>
+          Math.min(prev + 20, parseInt(cardData.meals))
+        );
+      }, 10);
+      const intervalCO2 = setInterval(() => {
+        setAnimatedCO2((prev) => Math.min(prev + 13, parseInt(cardData.co2)));
+      }, 10);
+      const intervalMoney = setInterval(() => {
+        setAnimatedMoney((prev) =>
+          Math.min(prev + 980, parseInt(cardData.money))
+        );
+      }, 10);
+
+      return () => {
+        clearInterval(intervalMeals);
+        clearInterval(intervalCO2);
+        clearInterval(intervalMoney);
+      };
+    }
+  }, [cardData]);
 
   return (
     <StyledDiv variant="secondary">
@@ -55,10 +82,9 @@ const HeaderSection: React.FC<HeaderSectionProps> = () => {
                   color="text.secondary"
                   paragraph
                 >
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                  Vestibulum massa lectus, imperdiet eu mi et, porta tempor
-                  magna. Aliquam efficitur, arcu ac pellentesque euismod, arcu
-                  lacus porta augue
+                  Om en fjärdedel av den mat som för närvarande går förlorad
+                  eller till spillo kan sparas, skulle det räcka för att mata
+                  870 miljoner människor.
                 </Typography>
               </Container>
             </Box>
@@ -79,7 +105,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = () => {
                   <Grid item xs={12} lg={3}>
                     <StyledCard
                       title={"Antall måltider"}
-                      content={cardData?.mealCount || "N/A"}
+                      content={loading ? "N/A" : animatedMeals.toString()}
                       backgroundColor="white"
                       textColor={theme.palette.primary.main}
                     />
@@ -87,7 +113,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = () => {
                   <Grid item xs={12} lg={3}>
                     <StyledCard
                       title={"CO2 spart"}
-                      content={cardData?.savedCO2 || "N/A"}
+                      content={loading ? "N/A" : animatedCO2.toString()}
                       backgroundColor="white"
                       textColor={theme.palette.primary.main}
                     />
@@ -95,7 +121,7 @@ const HeaderSection: React.FC<HeaderSectionProps> = () => {
                   <Grid item xs={12} lg={3}>
                     <StyledCard
                       title={"Penger spart"}
-                      content={cardData?.savedMoney || "N/A"}
+                      content={loading ? "N/A" : animatedMoney.toString()}
                       backgroundColor="white"
                       textColor={theme.palette.primary.main}
                     />

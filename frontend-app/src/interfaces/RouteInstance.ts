@@ -9,6 +9,6 @@ export interface RouteInstance {
 }
 
 export enum Status {
-  STARTED = "Pågående",
-  FINISHED = "Avsluttet",
+  ACTIVE = "ACTIVE",
+  FINISHED = "FINISHED",
 }

@@ -6,8 +6,6 @@ import SimpleMarkerSymbol from "@arcgis/core/symbols/SimpleMarkerSymbol";
 import PictureMarkerSymbol from "@arcgis/core/symbols/PictureMarkerSymbol";
 
 const BASEMAP = "streets-vector";
-const CENTER = [14.5, 58.5];
-const ZOOM_LEVEL = 5;
 
 export const initializeMap = (): ArcGISMap => {
   return new ArcGISMap({ basemap: BASEMAP });
@@ -15,13 +13,15 @@ export const initializeMap = (): ArcGISMap => {
 
 export const initializeView = (
   map: ArcGISMap,
-  containerId: string
+  containerId: string,
+  center: [number, number] = [14.5, 58.5], // Default value if not passed
+  zoom: number = 5 // Default value if not passed
 ): MapView => {
   return new MapView({
     map,
     container: containerId,
-    center: CENTER,
-    zoom: ZOOM_LEVEL,
+    center,
+    zoom,
   });
 };
 

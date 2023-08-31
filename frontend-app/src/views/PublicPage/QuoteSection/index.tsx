@@ -4,8 +4,8 @@ import FormatQuoteIcon from "@mui/icons-material/FormatQuote";
 import axios from "axios";
 import { useState, useEffect } from "react";
 interface QuoteData {
-  weight: number;
-  location: string;
+  totalMeals: number;
+  recpient: string;
 }
 
 interface QuoteSectionProps {}
@@ -15,7 +15,7 @@ const QuoteSection: React.FC<QuoteSectionProps> = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/quote")
+      .get("http://localhost:8080/recipient/latest")
       .then((response) => {
         setQuoteData(response.data);
       })
@@ -42,8 +42,10 @@ const QuoteSection: React.FC<QuoteSectionProps> = () => {
             paragraph
             sx={{ my: "auto" }}
           >
-            {`Vi levererade nyss ${quoteData?.weight || "N/A"} kg till ${
-              quoteData?.location || "N/A"
+            {`Vi levererade nyss ${
+              quoteData?.totalMeals || "N/A"
+            } måltider till ${
+              quoteData?.recpient || "N/A"
             }. Tack alla som bidragit!`}
           </Typography>
         )}
