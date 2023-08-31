@@ -63,3 +63,5 @@ Den totala tiden av presentation får ni distribuera som ni vill men den måste 
     - http://localhost:8080/totaldelivered
  * Hämtar ETA
     - http://localhost:8080/eta/get/{id}
+ * Hämtar senaste leveransen
+    - http://localhost:8080/recipient/latest
