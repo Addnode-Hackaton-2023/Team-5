@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.hackathon.grupp5.backend.consts.Status;
+import com.hackathon.grupp5.backend.model.frontenddto.CitatDTO;
 import com.hackathon.grupp5.backend.model.frontenddto.FrontendETA;
 import com.hackathon.grupp5.backend.model.frontenddto.FrontendGraphDTO;
 import com.hackathon.grupp5.backend.model.frontenddto.TotalDelivered;
@@ -69,12 +70,16 @@ public class ETAService
         if (finishedEtas.isEmpty()) {
             return Optional.empty();
         } else {
-            var totalWeight = finishedEtas.stream().mapToDouble(eta -> eta.getWeight()).sum();
+            var totalWeight = finishedEtas.stream().mapToDouble(ETA::getWeight).sum();
             return Optional.of(new TotalDelivered(totalWeight * mealFactor, totalWeight * co2Factor, totalWeight * moneyFactor));
         }
     }
 
     public List<FrontendGraphDTO> getDeliveryChartDTO() {
         return etaRepository.getDeliveryGraph().stream().peek(dto -> dto.setTotalMeals(dto.getTotal_weight().intValue() * 4)).toList();
+    }
+
+    public Optional<CitatDTO> getLatestDelivery() {
+        return etaRepository.findTopByOrderByEtaDesc().stream().findFirst().map(dto -> new CitatDTO(dto.getRecipient(), dto.getWeight().intValue() * 4));
     }
 }
