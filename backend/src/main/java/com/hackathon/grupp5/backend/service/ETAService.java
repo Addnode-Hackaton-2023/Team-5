@@ -59,6 +59,6 @@ public class ETAService
     }
 
     public List<FrontendGraphDTO> getDeliveryChartDTO() {
-        return etaRepository.getDeliveryGraph();
+        return etaRepository.getDeliveryGraph().stream().peek(dto -> dto.setTotalMeals(dto.getTotal_weight().intValue() * 4)).toList();
     }
 }

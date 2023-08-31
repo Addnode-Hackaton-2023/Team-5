@@ -28,6 +28,6 @@ public class ExternalRouteInstance {
     private Double latestLongitude;
     @JsonProperty("loadedWeight")
     private Double loadedWeight;
-    @JsonProperty("stops")
+    @JsonProperty("currentJobStops")
     private ExternalStop[] stops;
 }
