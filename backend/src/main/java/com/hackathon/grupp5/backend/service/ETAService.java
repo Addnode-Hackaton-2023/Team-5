@@ -137,7 +137,7 @@ public class ETAService
                         isActiveURL, HttpMethod.GET, null, Boolean.class);
                 if(isActive.getStatusCode().is2xxSuccessful()) {
                     Boolean responseValue = isActive.getBody();
-                    if(responseValue != null && responseValue) {
+                    if(responseValue != null && !responseValue) {
                         eta.setStatus(Status.FINISHED);
                         update(eta);
                     }
