@@ -1,8 +1,10 @@
 package com.hackathon.grupp5.backend.service;
 
-import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
+import com.hackathon.grupp5.backend.consts.Status;
+import com.hackathon.grupp5.backend.model.frontenddto.FrontendETA;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -21,10 +23,18 @@ public class ETAService
     /**
      * add new ETA
      */
-    public String addEta(ETA eta)
+    public String add(ETA eta)
     {
         etaRepository.save(eta);
         return"new eta: " + eta.getId();
+    }
+
+    /**
+     * update ETA
+     */
+    public String update(ETA eta)
+    {
+        return add(eta);
     }
 
     /**
@@ -33,5 +43,17 @@ public class ETAService
     public Optional<ETA> getEtaById(Long id)
     {
         return etaRepository.findById(id);
+    }
+
+    /**
+     * get all ETA by status
+     */
+    public List<ETA> getAllByStatus(Status status) {
+        return etaRepository.findAllByStatus(status);
+    }
+
+    public Optional<FrontendETA> getETAMappedToFrontEnd(Long id) {
+        Optional<ETA> savedETA = etaRepository.findById(id);
+        return savedETA.map(s -> new FrontendETA(s.getEta(), s.getLongitude(), s.getLatitude(), s.getStatus().toString()));
     }
 }
