@@ -57,7 +57,7 @@ Den totala tiden av presentation får ni distribuera som ni vill men den måste 
   - Vad är nästa steg, rekommendationer för framtiden?
 
  # Våra REST-API endpoints
- * Hämtar data antal  på stad och dag
+ * Hämtar antal måltider grupperad på stad och dag
     - http://localhost:8080/deliverychart
  * Hämtar ETA
     - http://localhost:8080/eta/get/{id}
