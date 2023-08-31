@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.hackathon.grupp5.backend.consts.Status;
 import com.hackathon.grupp5.backend.model.frontenddto.FrontendETA;
+import com.hackathon.grupp5.backend.model.frontenddto.FrontendGraphDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,8 +53,12 @@ public class ETAService
         return etaRepository.findAllByStatus(status);
     }
 
-    public Optional<FrontendETA> getETAMappedToFrontEnd(Long id) {
+    public Optional<FrontendETA> getETAMappedToFrontEndDTO(Long id) {
         Optional<ETA> savedETA = etaRepository.findById(id);
         return savedETA.map(s -> new FrontendETA(s.getEta(), s.getLongitude(), s.getLatitude(), s.getStatus().toString()));
+    }
+
+    public List<FrontendGraphDTO> getDeliveryChartDTO() {
+        return etaRepository.getDeliveryGraph();
     }
 }
