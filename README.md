@@ -58,6 +58,6 @@ Den totala tiden av presentation får ni distribuera som ni vill men den måste 
 
  # Våra REST-API endpoints
  * Hämtar data antal  på stad och dag
-  - http://localhost:8080/deliverychart
+    - http://localhost:8080/deliverychart
  * Hämtar ETA
-  - http://localhost:8080/eta/get/{id}
+    - http://localhost:8080/eta/get/{id}
