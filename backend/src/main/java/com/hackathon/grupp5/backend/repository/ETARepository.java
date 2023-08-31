@@ -3,12 +3,10 @@ package com.hackathon.grupp5.backend.repository;
 
 import java.util.Optional;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.hackathon.grupp5.backend.model.ETAModel;
+import com.hackathon.grupp5.backend.model.ETA;
 
-public interface ETARepository extends CrudRepository<ETAModel, Long>
+public interface ETARepository extends JpaRepository<ETA, Long>
 {
-    @Override
-    Optional<ETAModel> findById(Long aLong);
 }

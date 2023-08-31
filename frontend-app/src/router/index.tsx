@@ -13,7 +13,7 @@ export const router = createBrowserRouter([
         element: <PublicPage />,
       },
       {
-        path: "/eta",
+        path: "/eta/:id",
         element: <EtaPage />,
       },
     ],

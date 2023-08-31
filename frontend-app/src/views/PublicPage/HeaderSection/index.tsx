@@ -1,11 +1,32 @@
 import { Box, Grid, Container, Typography, useTheme } from "@mui/material";
 import StyledCard from "../../../components/styled-card";
 import StyledDiv from "../../../components/styled-divs";
+import axios from "axios";
+import { useState, useEffect } from "react";
 
 interface HeaderSectionProps {}
 
+interface TotalSavedData {
+  mealCount: string;
+  savedCO2: string;
+  savedMoney: string;
+}
+
 const HeaderSection: React.FC<HeaderSectionProps> = () => {
   const theme = useTheme();
+
+  const [cardData, setCardData] = useState<TotalSavedData>();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/api/cards")
+      .then((response) => {
+        setCardData(response.data);
+      })
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <StyledDiv variant="secondary">
@@ -49,30 +70,38 @@ const HeaderSection: React.FC<HeaderSectionProps> = () => {
               display={"flex"}
               justifyContent={"center"}
             >
-              <Grid item xs={12} lg={3}>
-                <StyledCard
-                  title={"Antall måltider"}
-                  content={"34"}
-                  backgroundColor="white"
-                  textColor={theme.palette.primary.main}
-                />
-              </Grid>
-              <Grid item xs={12} lg={3}>
-                <StyledCard
-                  title={"CO2 spart"}
-                  content={"100kg"}
-                  backgroundColor="white"
-                  textColor={theme.palette.primary.main}
-                />
-              </Grid>
-              <Grid item xs={12} lg={3}>
-                <StyledCard
-                  title={"Penger spart"}
-                  content={"100,-"}
-                  backgroundColor="white"
-                  textColor={theme.palette.primary.main}
-                />
-              </Grid>
+              {loading ? (
+                <Typography variant="h6" align="center">
+                  Loading...
+                </Typography>
+              ) : (
+                <>
+                  <Grid item xs={12} lg={3}>
+                    <StyledCard
+                      title={"Antall måltider"}
+                      content={cardData?.mealCount || "N/A"}
+                      backgroundColor="white"
+                      textColor={theme.palette.primary.main}
+                    />
+                  </Grid>
+                  <Grid item xs={12} lg={3}>
+                    <StyledCard
+                      title={"CO2 spart"}
+                      content={cardData?.savedCO2 || "N/A"}
+                      backgroundColor="white"
+                      textColor={theme.palette.primary.main}
+                    />
+                  </Grid>
+                  <Grid item xs={12} lg={3}>
+                    <StyledCard
+                      title={"Penger spart"}
+                      content={cardData?.savedMoney || "N/A"}
+                      backgroundColor="white"
+                      textColor={theme.palette.primary.main}
+                    />
+                  </Grid>
+                </>
+              )}
             </Grid>
           </Grid>
         </Grid>

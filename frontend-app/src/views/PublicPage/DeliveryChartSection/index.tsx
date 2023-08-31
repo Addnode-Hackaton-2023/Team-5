@@ -14,6 +14,8 @@ interface DeliveryChartData {
 }
 
 const ChartSection: React.FC<ChartSectionProps> = () => {
+  const theme = useTheme();
+
   const [deliveryChartData, setDeliveryChartData] =
     useState<DeliveryChartData[]>();
   const [loading, setLoading] = useState<Boolean>(true);
@@ -32,40 +34,31 @@ const ChartSection: React.FC<ChartSectionProps> = () => {
     fetchChartData();
   }, []);
 
-  const theme = useTheme();
+  // Transformed data for chart
+  const transformedSeries = deliveryChartData?.reduce(
+    (acc, data) => {
+      const existing = acc.find((item) => item.name === data.city);
+      if (existing) {
+        existing.data.push(data.mealCount);
+      } else {
+        acc.push({ name: data.city, data: [data.mealCount] });
+      }
+      return acc;
+    },
+    [] as { name: string; data: number[] }[]
+  );
 
+  // Days for categories (Assuming sorted)
+  const categories =
+    deliveryChartData?.map((data) => new Date(data.day).toLocaleDateString()) ||
+    [];
+
+  // Final Chart Data
   const chartData: ApexOptions = {
-    chart: {
-      type: "area",
-    },
-    stroke: {
-      curve: "smooth",
-    },
-    xaxis: {
-      categories: [2016, 2017, 2018, 2019.202, 2021, 2022, 2023],
-    },
-    legend: {
-      width: 600,
-      horizontalAlign: "left",
-      itemMargin: {
-        vertical: 5,
-        horizontal: 5,
-      },
-    },
-    series: [
-      {
-        name: "Stockholm",
-        data: [10, 20, 30, 33, 44, 66, 100],
-      },
-      {
-        name: "Gøteborg",
-        data: [11, 32, 45, 32, 34, 52, 41],
-      },
-      {
-        name: "Lund",
-        data: [0, 34, 52, 41, 11, 32, 45],
-      },
-    ],
+    chart: { type: "area" },
+    stroke: { curve: "smooth" },
+    xaxis: { categories },
+    series: transformedSeries,
   };
   return (
     <StyledDiv variant="white">
@@ -93,7 +86,16 @@ const ChartSection: React.FC<ChartSectionProps> = () => {
         </Grid>
         <Grid item xs={12} lg={6}>
           <Box sx={{ width: "100%", mx: "auto" }}>
-            <ReactApexChart options={chartData} series={chartData.series} />
+            {loading ? (
+              <Typography variant="h6" align="center">
+                Loading...
+              </Typography>
+            ) : (
+              <ReactApexChart
+                options={chartData}
+                series={chartData.series || []}
+              />
+            )}
           </Box>
         </Grid>
       </Grid>

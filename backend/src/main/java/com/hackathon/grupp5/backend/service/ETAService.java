@@ -1,11 +1,15 @@
 package com.hackathon.grupp5.backend.service;
 
-import lombok.RequiredArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.hackathon.grupp5.backend.model.ETA;
 import com.hackathon.grupp5.backend.repository.ETARepository;
+
+import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
@@ -14,13 +18,20 @@ public class ETAService
     @Autowired
     ETARepository etaRepository;
 
-    public String getEtaById(Long id)
+    /**
+     * add new ETA
+     */
+    public String addEta(ETA eta)
     {
-        if (id == 1L) {
-            return "YääY";
-        } else {
-            return "NäääY";
-        }
-        //return etaRepository.findById(id);
+        etaRepository.save(eta);
+        return"new eta: " + eta.getId();
+    }
+
+    /**
+     * get ETA by id
+     */
+    public Optional<ETA> getEtaById(Long id)
+    {
+        return etaRepository.findById(id);
     }
 }
