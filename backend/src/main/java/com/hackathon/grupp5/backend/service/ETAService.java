@@ -14,6 +14,8 @@ import com.hackathon.grupp5.backend.model.frontenddto.FrontendETA;
 import com.hackathon.grupp5.backend.model.frontenddto.FrontendGraphDTO;
 import com.hackathon.grupp5.backend.model.frontenddto.TotalDelivered;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.hackathon.grupp5.backend.model.ETA;
@@ -104,12 +106,15 @@ public class ETAService
                 var recpient = "";
                 var recpientPhoneNumber = "";
                 if (routeInstance.getStops().length > 0) {
-                    recpient = routeInstance.getStops()[routeInstance.getStops().length - 1].getName();
+                    recpient = routeInstance.getStops()[routeInstance.getStops().length - 1].getStopName();
                     recpientPhoneNumber = routeInstance.getStops()[routeInstance.getStops().length - 1].getContactPerson();
+                    if(routeInstance.getJobId() == 1) {
+                        System.out.println("Här fick vi null");
+                    }
                 }
 
                 ETA eta = new ETA(
-                        routeInstance.getRouteId(),
+                        routeInstance.getJobId(),
                         LocalDateTime.parse(routeInstance.getEta()),
                         routeInstance.getLatestLongitude(),
                         routeInstance.getLatestLatitude(),
@@ -126,19 +131,26 @@ public class ETAService
 
             //Go over the list in database and set the ETAs that wasn't recieved to inactive.
             var activeEtas = getAllByStatus(Status.ACTIVE);
-            var filteredInactiveEtaList = activeEtas.stream()
-                    .filter(eta -> listOfRecievedETA.stream().anyMatch(recievedETA -> !Objects.equals(recievedETA.getId(), eta.getId()))).toList();
-
-            filteredInactiveEtaList.forEach(eta -> {
-                eta.setStatus(Status.FINISHED);
-                update(eta);
+            activeEtas.forEach(eta -> {
+                String isActiveURL = "https://allwinapi20230830114644.azurewebsites.net/api/Job/IsActiveJob?jobId=" + eta.getId();
+                ResponseEntity<Boolean> isActive = restTemplate.exchange(
+                        isActiveURL, HttpMethod.GET, null, Boolean.class);
+                if(isActive.getStatusCode().is2xxSuccessful()) {
+                    Boolean responseValue = isActive.getBody();
+                    if(responseValue != null && responseValue) {
+                        eta.setStatus(Status.FINISHED);
+                        update(eta);
+                    }
+                } else if (isActive.getStatusCode().isError()) {
+                    System.out.println("Jobb id: " + eta.getId() + " hittades inte eller så är deras server nere");
+                }
             });
-
             //Go over the list and make new ETA if it not exists and send SMS to the client. If exists just update.
             listOfRecievedETA.forEach(eta -> {
                 Optional<ETA> savedETA = getEtaById(eta.getId());
-                if (savedETA.isPresent()) {
+                if (savedETA.isEmpty()) {
                     add(eta);
+                    System.out.println("Hej din leverans är på väg till dig, se mer information om din leverans på denna sida: http://localhost:3000/eta/" + eta.getId());
                 } else {
                     update(eta);
                 }

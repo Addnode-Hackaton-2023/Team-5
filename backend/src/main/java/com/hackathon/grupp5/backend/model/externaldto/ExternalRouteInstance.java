@@ -14,8 +14,6 @@ public class ExternalRouteInstance {
 
     @JsonProperty("jobId")
     private Long jobId;
-    @JsonProperty("routeId")
-    private Long routeId;
     @JsonProperty("routeName")
     private String routeName;
     @JsonProperty("townName")

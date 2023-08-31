@@ -11,8 +11,8 @@ import lombok.Data;
 public class ExternalStop {
     @JsonProperty("stopId")
     private Long stopId;
-    @JsonProperty("name")
-    private String name;
+    @JsonProperty("stopName")
+    private String stopName;
     @JsonProperty("contactPerson")
     private String contactPerson;
 }
