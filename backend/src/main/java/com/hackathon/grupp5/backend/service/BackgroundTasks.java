@@ -21,6 +21,8 @@ public class BackgroundTasks {
 
     @Autowired
     ETAService etaService;
+
+    //Do a task in the background
     @Scheduled(fixedDelay = 60000)
     public void backgroundRunner() {
         etaService.updateTasks();

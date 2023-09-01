@@ -29,6 +29,9 @@ public class ETAController
         return frontendETA.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
     }
 
+    /*
+        Forces an active job update
+     */
     @GetMapping(path = "/triggerupdate") public @ResponseStatus HttpStatus trigger(){
         etaService.updateTasks();
         return HttpStatus.OK;

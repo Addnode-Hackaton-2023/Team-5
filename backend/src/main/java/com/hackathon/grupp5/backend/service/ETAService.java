@@ -24,6 +24,8 @@ import java.util.concurrent.atomic.AtomicReference;
 @RequiredArgsConstructor
 @Service
 public class ETAService {
+    private static final String ExternalGetActiveJobsServiceURL = "https://allwinapi20230830114644.azurewebsites.net/api/Job/GetActiveJobs";
+    private static final String ExternalIsJobActiveURL = "https://allwinapi20230830114644.azurewebsites.net/api/Job/IsActiveJob";
     @Autowired
     ETARepository etaRepository;
 
@@ -79,7 +81,7 @@ public class ETAService {
         AtomicReference<Integer> totalWeight = new AtomicReference<>(0);
         return etaRepository.getDeliveryGraph().stream().peek(dto -> {
             totalWeight.set(totalWeight.get() + dto.getTotal_weight().intValue());
-            dto.setTotalMeals(totalWeight.get() * 4);
+            dto.setTotalMeals(totalWeight.get() * mealFactor);
         }).toList();
     }
 
@@ -88,9 +90,9 @@ public class ETAService {
     }
 
     public void updateTasks() {
-        final String uri = "https://allwinapi20230830114644.azurewebsites.net/api/Job/GetActiveJobs";
         RestTemplate restTemplate = new RestTemplate();
-        ExternalRouteInstance[] result = restTemplate.getForObject(uri, ExternalRouteInstance[].class);
+        //Ask for active jobs from remote service
+        ExternalRouteInstance[] result = restTemplate.getForObject(ExternalGetActiveJobsServiceURL, ExternalRouteInstance[].class);
 
         if (result != null) {
             List<ETA> listOfRecievedETA = Arrays.stream(result).map(routeInstance -> {
@@ -100,9 +102,6 @@ public class ETAService {
                 if (routeInstance.getStops().length > 0) {
                     recpient = routeInstance.getStops()[routeInstance.getStops().length - 1].getStopName();
                     recpientPhoneNumber = routeInstance.getStops()[routeInstance.getStops().length - 1].getContactPerson();
-                    if (routeInstance.getJobId() == 1) {
-                        System.out.println("Här fick vi null");
-                    }
                 }
 
                 return new ETA(
@@ -123,7 +122,7 @@ public class ETAService {
             var activeEtas = getAllByStatus(Status.ACTIVE);
             activeEtas.forEach(eta -> {
                 try {
-                    String isActiveURL = "https://allwinapi20230830114644.azurewebsites.net/api/Job/IsActiveJob?jobId=" + eta.getId();
+                    String isActiveURL = ExternalIsJobActiveURL + "?jobId=" + eta.getId();
                     ResponseEntity<Boolean> isActive = restTemplate.exchange(
                             isActiveURL, HttpMethod.GET, null, Boolean.class);
                     if (isActive.getStatusCode().is2xxSuccessful()) {
@@ -136,7 +135,7 @@ public class ETAService {
                         System.out.println("Jobb id: " + eta.getId() + " hittades inte eller så är deras server nere");
                     }
                 } catch (Exception e) {
-                    System.out.println("Jobb id: " + eta.getId() + " deras server verkar vara nere");
+                    System.out.println("Jobb id: " + eta.getId() + " lyckades inte kontrolleras eftersom deras server verkar vara nere");
                 }
             });
             //Go over the list and make new ETA if it not exists and send SMS to the client. If exists just update.
@@ -144,6 +143,7 @@ public class ETAService {
                 Optional<ETA> savedETA = getEtaById(eta.getId());
                 if (savedETA.isEmpty()) {
                     add(eta);
+                    //Here should a sms be sent
                     System.out.println("Hej din leverans är på väg till dig, se mer information om din leverans på denna sida: http://localhost:3000/eta/" + eta.getId());
                 } else {
                     update(eta);
